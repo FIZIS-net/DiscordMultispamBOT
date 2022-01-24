@@ -27,10 +27,20 @@ class spamBot():
 
         for message in copied_messages:
             try:
-                msgArr[message["id"]] = {'author_id': message["author"]['id'], 'message_content' : message["content"]}
+                msgArr[message["id"]] = {
+                    'author_id': message["author"]['id'],
+                    'message_content' : message["content"],
+                }
+                if "referenced_message" in message:
+                    msgArr[message["id"]]["message_reference"] = {
+                        "channel_id" : self.id_insert_chat,
+                        "message_id" : message["referenced_message"]["id"]
+                    }
+            
                 messages_ids += 1
             except:
-                print('error')
+                print('ERROR')
+                print(message)
             
         return msgArr
     
@@ -47,7 +57,7 @@ class spamBot():
         session.headers['authorization'] = discord_token
         session.headers['accept'] = "*/*"
         session.headers["connection"]=  "keep-alive"
-        session.headers["accept-encoding"] = "br"
+        # session.headers["accept-encoding"] = "br"
         session.headers["accept-language"] = "en-GB"
         session.headers["content-type"] = "application/json"
         session.headers["X-Debug-Options"] = "bugReporterEnabled"
@@ -80,7 +90,15 @@ class spamBot():
         msgArr = {}
         for message in copied_messages:
             try:
-                msgArr[message["id"]] = {'author_id': message["author"]['id'], 'message_content' : message["content"]}
+                msgArr[message["id"]] = {
+                    'author_id': message["author"]['id'],
+                    'message_content' : message["content"]
+                    }
+                if "referenced_message" in message:
+                    msgArr[message["id"]]["message_reference"] = {
+                    "channel_id" : self.id_insert_chat,
+                    "message_id" : message["referenced_message"]["id"]
+                }
             except:
                 print('error')
         return msgArr
@@ -113,7 +131,7 @@ class spamBot():
         keys = list(dictMessages.keys())
         return keys[0]
 
-    def send_message(self,session,msg):
+    def send_message(self,session,msg,sent_msg):
         """send_message
             sends a message through the session you selected
         Args:
@@ -124,13 +142,24 @@ class spamBot():
             string : response from the server
         """        
         try:
-            _data = {'content':msg, 'tts':False}
-            session.post(f'https://discord.com/api/v9/channels/{self.id_insert_chat}/messages', json=_data).json()
-            return session.status_code
+            text = msg["message_content"]
+            if "message_reference" in msg and msg['message_reference']['message_id'] in sent_msg:
+                _data = {
+                    'content': text,
+                    "message_reference": {
+                        "channel_id": msg['message_reference']['channel_id'],
+                        "message_id": sent_msg[msg['message_reference']['message_id']]["msg_id"]
+                    },
+                    'tts':False}
+            else:
+                _data = {'content':text, 'tts':False}
+            req = session.post(f'https://discord.com/api/v9/channels/{self.id_insert_chat}/messages', json=_data).json()
+            return req
         except Exception as e:
+            print(e)
             return e
 
-    def send_Typing(self, session):
+    def send_typing(self, session):
         response = session.post(f'https://discord.com/api/v9/channels/{self.id_insert_chat}/typing')
         return response
 
@@ -147,7 +176,6 @@ class spamBot():
     def send_join(self, session, inviteCode):
         url = "https://discord.com/api/v9/invites/" + inviteCode
         Cookie = self.get_cookie()
-        print(Cookie)
         if Cookie["Dcfduid"] == "" and Cookie["Sdcfduid"] == "":
             print("Error: Cookie is empty")
             return
@@ -156,10 +184,8 @@ class spamBot():
         req = session.post(url , data="{}")
         return req
 
-
     def get_fingerprint(self):
         resp = r.get(f"https://discordapp.com/api/v9/experiments")
         resp = json.loads(resp.text)
         resp = resp["fingerprint"]
-        print(resp)
         return resp
