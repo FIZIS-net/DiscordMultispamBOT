@@ -39,7 +39,7 @@ class spamBot():
             
                 messages_ids += 1
             except:
-                print('ERROR')
+                print('get_messages ERROR')
                 print(message)
             
         return msgArr
@@ -94,13 +94,19 @@ class spamBot():
                     'author_id': message["author"]['id'],
                     'message_content' : message["content"]
                     }
-                if "referenced_message" in message:
+                if "referenced_message" in message and message["referenced_message"] != None:
                     msgArr[message["id"]]["message_reference"] = {
                     "channel_id" : self.id_insert_chat,
                     "message_id" : message["referenced_message"]["id"]
                 }
+                elif "message_reference" in message and message["message_reference"] != None:
+                    msgArr[message["id"]]["message_reference"] = {
+                    "channel_id" : self.id_insert_chat,
+                    "message_id" : message["message_reference"]["message_id"]
+                }
+                    
             except:
-                print('error')
+                print(f'get_messages_before ERROR')
         return msgArr
 
     def reverseDict(self, dict):

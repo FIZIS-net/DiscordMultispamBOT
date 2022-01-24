@@ -69,7 +69,7 @@ for key in loaded_msg:
         delay_active = False
     try:
         msg = loaded_msg[key]
-        print(f'Sending message' + msg["message_content"])
+        print(f'Sending message: ' + msg["message_content"])
         delay = random.randint(delay_start, delay_end)
         if('https://' not in msg["message_content"] and ':' not in msg["message_content"] and '$' not in msg["message_content"]):
             for session in sessions:
