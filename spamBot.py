@@ -195,3 +195,9 @@ class spamBot():
         resp = json.loads(resp.text)
         resp = resp["fingerprint"]
         return resp
+
+    def set_avatar(self,base64, session):
+        url = "https://discord.com/api/v9/users/@me"
+        data = "data:image/png;base64," + base64
+        resp = session.patch(url , data={"avatar": data})
+        return resp
