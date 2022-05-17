@@ -8,12 +8,12 @@ from time import time, sleep
 import json
 import base64
 
-id_copied_chat = input(f'Введите id чата откуда копировать сообщения: ')
-id_insert_chat = input(f'Введите id чата куда копировать сообщения: ')
-messages_count = int(input(f'Введите число сообщений кратное 100: '))
-delay_start = int(input(f'Введите минимальную задержку на сервере: '))
-delay_end = int(input(f'Введите максимальную задержку: '))
-typing_delay = int(input(f'Введите задержку на печать: '))
+id_copied_chat = input(f'Enter the chat id from where to copy messages: ')
+id_insert_chat = input(f'Enter the chat id where to copy messages: ')
+messages_count = int(input(f'Enter a multiple of 100 messages: '))
+delay_start = int(input(f'Enter the minimum delay on the server: '))
+delay_end = int(input(f'Enter the maximum delay: '))
+typing_delay = int(input(f'Enter the print delay: '))
 
 bot = spamBot(id_copied_chat, id_insert_chat)
 tokens_list = open('tokens.txt', 'r', encoding='utf-8').read().splitlines()
